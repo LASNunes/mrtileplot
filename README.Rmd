@@ -2,8 +2,6 @@
 output: github_document
 ---
 
-<!-- README.md is generated from README.Rmd. Please edit that file -->
-
 ```{r, include = FALSE}
 knitr::opts_chunk$set(
   collapse = TRUE,
@@ -16,9 +14,10 @@ knitr::opts_chunk$set(
 # mrtileplot
 
 <!-- badges: start -->
+
 <!-- badges: end -->
 
-The goal of mrtileplot is to ...
+The goal of mrtileplot is to provide a function to create a tile plot for multiple regions and annotations.
 
 ## Installation
 
@@ -31,25 +30,24 @@ pak::pak("LASNunes/mrtileplot")
 
 ## Example
 
-This is a basic example which shows you how to solve a common problem:
+This is a basic example:
 
 ```{r example}
 library(mrtileplot)
 ## basic example code
+region_data <- data.frame(
+  patient = rep(c("Patient1", "Patient2"), each = 3),
+  region = rep(c("Region1", "Region2", "Region3"), times = 2),
+  value = c("A", "A", "B", "B", "B", "C")
+)
+
+annotation_data <- data.frame(
+  patient = rep(c("Patient1", "Patient2"), each = 2),
+  annotation = rep(c("Annotation1", "Annotation2"), times = 2),
+  annotation_value = c("X", "Y", "Y", "Z")
+)
+
+p <- mr_tileplot(region_data, annotation_data)
+
+plot(p)
 ```
-
-What is special about using `README.Rmd` instead of just `README.md`? You can include R chunks like so:
-
-```{r cars}
-summary(cars)
-```
-
-You'll still need to render `README.Rmd` regularly, to keep `README.md` up-to-date. `devtools::build_readme()` is handy for this.
-
-You can also embed plots, for example:
-
-```{r pressure, echo = FALSE}
-plot(pressure)
-```
-
-In that case, don't forget to commit and push the resulting figure files, so they display on GitHub and CRAN.
