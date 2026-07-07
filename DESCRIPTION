@@ -1,0 +1,17 @@
+Package: mrtileplot
+Title: Tile Plots for Multiregional Data
+Version: 0.0.0.9000
+Authors@R: 
+    person("Luís", "Nunes", email = "luis.nunes@ous-research.no", role = c("aut", "cre"))
+Description: Create tile plots for multiregional tumor, patient, and sample-level data with optional clinical and other annotation tracks.
+License: MIT + file LICENSE
+Encoding: UTF-8
+Roxygen: list(markdown = TRUE)
+RoxygenNote: 7.3.3
+Imports: 
+    dplyr,
+    ggplot2,
+    rlang
+Suggests: 
+    testthat (>= 3.0.0)
+Config/testthat/edition: 3
