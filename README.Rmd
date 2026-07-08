@@ -33,7 +33,7 @@ head(example_regions)
 head(example_annotations)
 ```
 
-### Baic plot
+### Basic plot
 
 ```{r basic-plot}
 

@@ -52,7 +52,7 @@ head(example_annotations)
     ## 61    Pt01 Treatment_Response  Responder
     ## 2     Pt02        Cancer_Type Colorectal
 
-### Baic plot
+### Basic plot
 
 ``` r
 # Create a tile plot where:
@@ -235,7 +235,7 @@ citation("mrtileplot")
     To cite package 'mrtileplot' in publications use:
 
       Nunes L (2026). _mrtileplot: tile plot for multiregional cancer
-      data_. R package version 0.0.0.9000,
+      data_. R package version 0.1.0,
       <https://github.com/LASNunes/mrtileplot>.
 
     A BibTeX entry for LaTeX users is
@@ -244,6 +244,6 @@ citation("mrtileplot")
         title = {mrtileplot: tile plot for multiregional cancer data},
         author = {Luís Nunes},
         year = {2026},
-        note = {R package version 0.0.0.9000},
+        note = {R package version 0.1.0},
         url = {https://github.com/LASNunes/mrtileplot},
       }
