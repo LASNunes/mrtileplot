@@ -23,7 +23,6 @@ mr_tileplot(
   sort_by = NULL,
   sort_levels = list(),
   gap = 0.35,
-  split_legends = TRUE,
   region_palette = NULL,
   annotation_palettes = NULL,
   palette = NULL,
@@ -75,9 +74,6 @@ patients after region sorting.}
 each variable in \code{sort_by}.}
 
 \item{gap}{Numeric size of the visual gap between region rows and annotation rows.}
-
-\item{split_legends}{Logical. If \code{TRUE}, draw separate legends for regions and
-each annotation track.}
 
 \item{region_palette}{Optional named vector for region values, or two colours
 for a continuous region scale.}

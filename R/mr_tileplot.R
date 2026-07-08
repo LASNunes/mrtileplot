@@ -31,8 +31,6 @@
 #' @param sort_levels Optional named list giving the desired order of values for
 #' each variable in `sort_by`.
 #' @param gap Numeric size of the visual gap between region rows and annotation rows.
-#' @param split_legends Logical. If `TRUE`, draw separate legends for regions and
-#' each annotation track.
 #' @param region_palette Optional named vector for region values, or two colours
 #' for a continuous region scale.
 #' @param annotation_palettes Optional named list of palettes, one per annotation.
@@ -76,7 +74,6 @@ mr_tileplot <- function(region_data,
                         sort_by = NULL,
                         sort_levels = list(),
                         gap = 0.35,
-                        split_legends = TRUE,
                         region_palette = NULL,
                         annotation_palettes = NULL,
                         palette = NULL,
@@ -190,76 +187,58 @@ mr_tileplot <- function(region_data,
   
   p <- ggplot2::ggplot()
   
-  if (split_legends) {
-    p <- p +
-      ggplot2::geom_tile(
-        data = region_plot,
-        ggplot2::aes(x = .data$x, 
-                     y = .data$y, 
-                     fill = .data$value),
-        colour = tile_colour, 
-        width = 0.9, 
-        height = 0.9
+  p <- p +
+    ggplot2::geom_tile(
+      data = region_plot,
+      ggplot2::aes(x = .data$x, 
+                   y = .data$y, 
+                   fill = .data$value),
+      colour = tile_colour, 
+      width = 1, 
+      height = 1
       )
     
-    p <- add_fill_scale(p,
-                        data = region_plot,
-                        scale_name = "Regions",
-                        palette = region_palette,
-                        na_colour = na_colour
-                        )
+  p <- add_fill_scale(p,
+                      data = region_plot,
+                      scale_name = "Regions",
+                      palette = region_palette,
+                      na_colour = na_colour,
+                      legend_direction = "vertical",
+                      legend_ncol = 1
+                      )
     
-    if (!is.null(annotation_plot)) {
-      for (ann in annotation_order) {
-        ann_data <- annotation_plot |>
-          dplyr::filter(.data$row == ann)
+  if (!is.null(annotation_plot)) {
+    for (ann in annotation_order) {
+      ann_data <- annotation_plot |>
+        dplyr::filter(.data$row == ann)
         
-        ann_palette <- get_annotation_palette(
-          annotation_name = ann,
-          annotation_palettes = annotation_palettes,
-          palette = palette
-        )
+      ann_palette <- get_annotation_palette(
+        annotation_name = ann,
+        annotation_palettes = annotation_palettes,
+        palette = palette
+      )
         
-        p <- p +
-          ggnewscale::new_scale_fill() +
-          ggplot2::geom_tile(
-            data = ann_data,
-            ggplot2::aes(x = .data$x, 
-                         y = .data$y, 
-                         fill = .data$value),
-            colour = tile_colour, 
-            width = 0.9, 
-            height = 0.9
+      p <- p +
+        ggnewscale::new_scale_fill() +
+        ggplot2::geom_tile(
+          data = ann_data,
+          ggplot2::aes(x = .data$x, 
+                       y = .data$y, 
+                       fill = .data$value),
+          colour = tile_colour, 
+          width = 1, 
+          height = 1
           )
-        
-        p <- add_fill_scale(p,
-                            data = ann_data,
-                            scale_name = ann,
-                            palette = ann_palette,
-                            na_colour = na_colour
-                            )
-      }
-    }
-  } else {
-    plot_data <- dplyr::bind_rows(region_plot, annotation_plot)
-    
-    p <- p +
-      ggplot2::geom_tile(
-        data = plot_data,
-        ggplot2::aes(x = .data$x, 
-                     y = .data$y, 
-                     fill = .data$value),
-        colour = tile_colour, 
-        width = 0.9, 
-        height = 0.9
+      
+      p <- add_fill_scale(p,
+                          data = ann_data,
+                          scale_name = ann,
+                          palette = ann_palette,
+                          na_colour = na_colour,
+                          legend_direction = "vertical",
+                          legend_ncol = 1
       )
-    
-    p <- add_fill_scale(p,
-                        data = plot_data,
-                        scale_name = NULL,
-                        palette = palette,
-                        na_colour = na_colour
-    )
+    }
   }
   
   p +
@@ -279,10 +258,14 @@ mr_tileplot <- function(region_data,
       panel.grid = ggplot2::element_blank(),
       axis.title = ggplot2::element_blank(),
       axis.title.x = ggplot2::element_blank(),
-      legend.position = "right",
-      legend.title = ggplot2::element_text(size = 10),
+      
+      legend.position = "bottom",
+      legend.box = "horizontal",
+      legend.direction = "vertical",
+      legend.box.just = "left",
+      legend.title = ggplot2::element_text(size = 8, face = "bold"),
       legend.text = ggplot2::element_text(size = 8),
-      legend.spacing.y = ggplot2::unit(0.1, "cm"),
-      legend.key.size = ggplot2::unit(0.4, "cm")
+      legend.spacing.x = ggplot2::unit(0.4, "cm"),
+      legend.key.size = ggplot2::unit(0.35, "cm")
     )
 }

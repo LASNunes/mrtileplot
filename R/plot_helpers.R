@@ -2,7 +2,9 @@ add_fill_scale <- function(p,
                            data,
                            scale_name,
                            palette = NULL,
-                           na_colour = "grey90") {
+                           na_colour = "grey90",
+                           legend_direction = "vertical",
+                           legend_ncol = 1) {
   is_continuous <- is.numeric(data$value)
   
   if (is_continuous) {
@@ -10,15 +12,23 @@ add_fill_scale <- function(p,
       p <- p +
         ggplot2::scale_fill_gradient(
           name = scale_name,
-          na.value = na_colour
+          na.value = na_colour,
+          guide = ggplot2:guide_colorbar(
+            direction = legend_direction,
+            title.position = "top"
           )
+        )
       } else {
         p <- p +
           ggplot2::scale_fill_gradient(
             name = scale_name,
             low = palette[[1]],
             high = palette[[length(palette)]],
-            na.value = na_colour
+            na.value = na_colour,
+            guide = ggplot2::guide_colorbar(
+              direction = legend_direction,
+              title.position = "top"
+            )
           )
         }
     } else {
@@ -26,7 +36,13 @@ add_fill_scale <- function(p,
         ggplot2::scale_fill_manual(
           name = scale_name,
           values = palette,
-          na.value = na_colour
+          na.value = na_colour,
+          guide = ggplot2::guide_legend(
+            direction = legend_direction,
+            ncol = legend_ncol,
+            byrow = TRUE,
+            title.position = "top"
+          )
         )
     }
   
