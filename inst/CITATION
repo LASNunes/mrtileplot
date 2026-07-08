@@ -1,0 +1,8 @@
+bibentry(
+  bibtype = "Manual",
+  title = "mrtileplot: tile plot for multiregional cancer data",
+  author = personList(person("Luís", "Nunes")),
+  year = "2026",
+  note = "R package version 0.0.0.9000",
+  url = "https://github.com/LASNunes/mrtileplot"
+)

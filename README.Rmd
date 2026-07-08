@@ -2,75 +2,196 @@
 output: github_document
 ---
 
-```{r, include = FALSE}
-knitr::opts_chunk$set(
-  collapse = TRUE,
-  comment = "#>",
-  fig.path = "man/figures/README-",
-  out.width = "100%"
-)
-```
-
 # mrtileplot
 
 <!-- badges: start -->
 
 <!-- badges: end -->
 
-The goal of mrtileplot is to provide a function to create a tile plot for multiple regions and annotations.
+`mrtileplot` is an R package for creating tile plots to visualize multiregion data. It is designed for datasets where each patient or tumor has multiple sampled regions, and where region-level values can be shown together with patient-level clinicopathological or other categorical annotations.
 
 ## Installation
 
-You can install the development version of mrtileplot from [GitHub](https://github.com/) with:
+You can install the development version of mrtileplot from [GitHub]:
 
 ``` r
-# install.packages("pak")
-pak::pak("LASNunes/mrtileplot")
+# install.packages("remotes")
+remotes::install_github("LASNunes/mrtileplot")
 ```
 
-## Example
+## Example data
 
-This is a basic example:
+The package includes a synthetic cancer-related dataset for examples:
 
 ```{r example}
 library(mrtileplot)
-## example code
 
-# Example region data
+# `example_regions` contains one row per patient-region pair:
 head(example_regions)
 
-# Example annotation data
+# `example_annotations` contains one row per patient-annotation pair:
 head(example_annotations)
-
-# Set colour palette
-example_pal <- c(
-  "Pos" = "forestgreen", "Neg" = "darkorange", 
-  "Female" = "grey20", "Male" = "white", 
-  "Stage I" = "grey20", "Stage II" = "grey", "Stage III" = "white", 
-  "Right colon" = "grey20", "Left colon" = "grey", "Rectum" = "white")
-
-# Create a tile plot
-p <- mr_tileplot(region_data = example_regions, 
-                 annotation_data = example_annotations, 
-                 palette = example_pal)
-
-plot(p)
 ```
 
-### Sorting by annotations example
-```{r sort-example}
+### Baic plot
 
-# Create a tile plot sorted by annotations
-p_sorted <- mr_tileplot(region_data = example_regions, 
-                        annotation_data = example_annotations, 
-                        palette = example_pal,
-                        annotation_order = c("Location", "Stage", "Gender"),
-                        sort_by = c("Gender", "Stage", "Location"),
-                        sort_levels = list(
-                          Gender = c("Female", "Male"),
-                          Stage = c("Stage I", "Stage II", "Stage III"),
-                          Location = c("Right colon", "Left colon", "Rectum"))
-                 )
+```{r basic-plot}
 
-plot(p_sorted)
+# Create a tile plot where:
+# - columns are patients;
+# - regions rows showing region-level values (top);
+# - annotation rows showing patient-level variables (bottom).
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations
+            )
 ```
+
+### Adding custom colours
+
+```{r colour-plot}
+
+# Provide separate palettes for region values and annotation values
+region_palette <- c(
+  "Immune_hot" = "#D73027",
+  "Immune_intermediate" = "#FEE08B",
+  "Immune_cold" = "#4575B4"
+)
+
+annotation_palettes <- list(
+  "Cancer_Type" = c(
+    "Colorectal" = "#1B9E77",
+    "Gastric" = "#D95F02",
+    "Lung" = "#7570B3"
+  ),
+  "Stage" = c(
+    "I" = "#F7FCF5",
+    "II" = "#C7E9C0",
+    "III" = "#74C476",
+    "IV" = "#238B45"
+  ),
+  "Grade" = c(
+    "G1" = "#FEE5D9",
+    "G2" = "#FCAE91",
+    "G3" = "#CB181D"
+  ),
+  "MSI_Status" = c(
+    "MSS" = "#FFFFFF",
+    "MSI" = "#252525"
+  ),
+  "Treatment_Response" = c(
+    "Responder" = "#2C7BB6",
+    "Stable" = "#FFFFBF",
+    "Non_responder" = "#D7191C"
+  )
+)
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            region_palette = region_palette,
+            annotation_palettes = annotation_palettes
+            )
+```
+
+### Controlling annotation row order
+
+```{r annotation-order-plot}
+
+# Use `annotation_order` to control the order of annotation tracks in the plot.
+# This changes only the vertical order of annotation rows.
+# It does not sort patients.
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            region_palette = region_palette,
+            annotation_palettes = annotation_palettes,
+            annotation_order = c("Treatment_Response", "Cancer_Type", "Stage", "Grade", "MSI_Status")
+            )
+```
+
+### Sorting patients by annotations
+
+```{r patient-sort-plot}
+
+# Use `sort_by` and `sort_levels` to sort patients using annotation values.
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            region_palette = region_palette,
+            annotation_palettes = annotation_palettes,
+            sort_by = c("Treatment_Response", "Stage"),
+            sort_levels = list(
+              Treatment_Response = c("Responder", "Stable", "Non_responder"),
+              Stage = c("I", "II", "III", "IV"))
+            )
+```
+
+### Sorting regions whithin patients
+
+```{r region-sort-plot}
+
+# Use `region_sort_by` and `region_sort_levels` to sort regions within patients.
+
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            region_palette = region_palette,
+            annotation_palettes = annotation_palettes,
+            sort_by = c("Treatment_Response", "Stage"),
+            sort_levels = list(
+              Treatment_Response = c("Responder", "Stable", "Non_responder"),
+              Stage = c("I", "II", "III", "IV")),
+            region_sort_by = "value",
+            region_sort_levels = c("Immune_hot", "Immune_intermediate", "Immune_cold"
+            ))
+
+# When regions are sorted, their displayed names are rewritten as consecutive names such as `T1`, `T2`, `T3`, ... This avoids empty spaces between regions from the same patient. The original region names are still kept internally in the plotted data.
+```
+
+### Sorting regions without sorting patient by regions
+
+```{r region-sort-plot2}
+
+# Sometimes you may want to sort regions within wach patient but keep patient sorting based only on clinical annotations. Set `sort_patients_by_regions = FALSE`.
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            # for continuous region values you need to provide two colours for the gradient
+            region_palette = c("#D95F02", "#7570B3"),
+            annotation_palettes = annotation_palettes,
+            sort_by = c("Treatment_Response", "Stage"),
+            sort_levels = list(
+              Treatment_Response = c("Responder", "Stable", "Non_responder"),
+              Stage = c("I", "II", "III", "IV")),
+            region_value = "tumor_cell_content",
+            region_sort_by = "tumor_cell_content",
+            region_sort_decreasing = TRUE,
+            sort_patients_by_regions = FALSE
+            )
+```
+
+### Controlling region-count sorting
+
+When patients have different numbers of samples regions, you can decide whether the number of regions contributes to patient sorting with `region_count_sort`. Available options are: - `"after_region"`: sort by the region variable, then region count, then annotations; - `"last"`: sort by the region variable, then annotations, then region count; - `"none"`: ignore region count during patient sorting.
+
+You can also provide the exact patient order manually with `patient_order`.
+
+## Expected input format
+
+The main region data frame should contain one row per patient-region pair, with at least three columns: - `patient`: patient or tumor identifier; - `region`: original region or sample identifier; - `value`: region-level variable to be shown in the plot (discrete or continuous).
+
+The annotation dataset should contain one row per patient-annotation pair in the long format, with the following three columns: - `patient`: patient or tumor identifier; - `annotation`: annotation track name; - `value`: annotation value.
+
+Column names can be changed using the function arguments:
+
+```{r}
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            patient = "patient",
+            region = "region",
+            region_value = "value",
+            annotation = "annotation",
+            annotation_value = "value"
+            )
+```
+
+## Citation
+
+If you use `mrtileplot` in your research, please cite it with:
+
+```{r citation, comment = ""} 
+citation("mrtileplot")

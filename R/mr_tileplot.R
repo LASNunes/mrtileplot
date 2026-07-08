@@ -1,7 +1,9 @@
-#' Draw a multiregional tile plot
+#' Draws a tile plot of regions and annotations for multiple patients or tumors.
 #' 
-#' Creates a tile plot where columns are tumors or patients, rows are regions
-#' and optional annotation tracks, and tile fill represents a discrete value.
+#' Creates a tile plot where each patient or tumor is represented by a column, 
+#' and each region or annotation is represented by a row. The function allows 
+#' for sorting of patients and regions based on specified criteria, and supports 
+#' custom color palettes for both regions and annotations.
 #' 
 #' @importFrom rlang .data
 #' 
@@ -45,20 +47,8 @@
 #' @export
 #' 
 #' @examples
-#' # Example data
-#' region_data <- data.frame(
-#'  patient = rep(c("Patient1", "Patient2"), each = 3),
-#'  region = rep(c("Region1", "Region2", "Region3"), times = 2),
-#'  value = c("A", "A", "B", "B", "B", "C")
-#' )
-#' 
-#' annotation_data <- data.frame(
-#' patient = rep(c("Patient1", "Patient2"), each = 2),
-#' annotation = rep(c("Annotation1", "Annotation2"), times = 2),
-#' annotation_value = c("X", "Y", "Y", "Z")
-#' )
-#' 
-#' mr_tileplot(region_data, annotation_data)
+#' mr_tileplot(region_data = example_regions, 
+#'             annotation_data = example_annotations)
 mr_tileplot <- function(region_data,
                         annotation_data = NULL,
                         patient = "patient",
