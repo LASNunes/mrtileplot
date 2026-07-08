@@ -3,24 +3,26 @@
 \docType{data}
 \name{example_annotations}
 \alias{example_annotations}
-\title{Example patient annotation data}
+\title{Synthetic cancer data}
 \format{
-A data frame with 9 rows and 3 columns:
+A data frame with 75 rows and 3 columns:
 \describe{
 \item{patient}{Patient or tumor identifier.}
-\item{annotation}{Annotation track name, such as \code{"Gender"} or \code{"Stage"}.}
-\item{value}{Discrete annotation value to use as tile fill.}
+\item{annotation}{Annotation track name.}
+\item{value}{Annotation value.}
 }
+}
+\source{
+Synthetic data generated for package examples.
 }
 \usage{
 example_annotations
 }
 \description{
-A small synthetic dataset showing one row per patient-annotation pair.
-This dataset is used to add patient-level annotation tracks to \code{mr_tileplot()}.
+A fictional cancer-related patient annotation dataset. Each row represents
+one patient-level clinicopathological annotation.
 }
 \examples{
-data(example_annotations)
 head(example_annotations)
 }
 \keyword{datasets}

@@ -1,33 +1,38 @@
-#' Example multiregional region data
+#' Synthetic multiregional cancer region data
 #' 
-#' A small synthetic dataset showing one row per patient-region pair.
-#' This dataset is used in examples and tests for `mr_tileplot()`.
+#' A fictional cancer-related dataset with multiple sampled regions per patient.
+#' Each row represents one tumor region from one patient. The dataset includes
+#' one discrete region-level variable, stored in `value`, and additional continuous
+#' region-level variable that can be used for sorting or alternative fill value. 
 #' 
-#' @format A data frame with 6 rows and 3 columns:
+#' @format A data frame with 45 rows and 4 columns:
 #' \describe{
-#'  \item{patient}{Patient or tumor identifier.}
-#'  \item{region}{Region or sample identifier, such as `"T1"` or `"T2"`.}
-#'  \item{value}{Discrete value to use as tile fill.}
+#'  \item{patient}{Patient identifier.}
+#'  \item{region}{Original region or sample identifier.}
+#'  \item{value}{Discrete region-level immune phenotype.}
+#'  \item{tumor_cell_content}{Continuous tumor cell content between 0 and 1.}
 #'}
 #'
+#' @source Synthetic data generated for package examples.
+#' 
 #' @examples
-#' data(example_regions)
 #' head(example_regions)
 "example_regions"
 
-#' Example patient annotation data
+#' Synthetic cancer data
 #' 
-#' A small synthetic dataset showing one row per patient-annotation pair.
-#' This dataset is used to add patient-level annotation tracks to `mr_tileplot()`.
+#' A fictional cancer-related patient annotation dataset. Each row represents
+#' one patient-level clinicopathological annotation.
 #' 
-#' @format A data frame with 9 rows and 3 columns:
+#' @format A data frame with 75 rows and 3 columns:
 #' \describe{
 #'  \item{patient}{Patient or tumor identifier.}
-#'  \item{annotation}{Annotation track name, such as `"Gender"` or `"Stage"`.}
-#'  \item{value}{Discrete annotation value to use as tile fill.}
+#'  \item{annotation}{Annotation track name.}
+#'  \item{value}{Annotation value.}
 #' }
 #' 
+#' @source Synthetic data generated for package examples.
+#' 
 #' @examples
-#' data(example_annotations)
 #' head(example_annotations)
 "example_annotations"

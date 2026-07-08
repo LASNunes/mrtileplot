@@ -3,24 +3,29 @@
 \docType{data}
 \name{example_regions}
 \alias{example_regions}
-\title{Example multiregional region data}
+\title{Synthetic multiregional cancer region data}
 \format{
-A data frame with 6 rows and 3 columns:
+A data frame with 45 rows and 4 columns:
 \describe{
-\item{patient}{Patient or tumor identifier.}
-\item{region}{Region or sample identifier, such as \code{"T1"} or \code{"T2"}.}
-\item{value}{Discrete value to use as tile fill.}
+\item{patient}{Patient identifier.}
+\item{region}{Original region or sample identifier.}
+\item{value}{Discrete region-level immune phenotype.}
+\item{tumor_cell_content}{Continuous tumor cell content between 0 and 1.}
 }
+}
+\source{
+Synthetic data generated for package examples.
 }
 \usage{
 example_regions
 }
 \description{
-A small synthetic dataset showing one row per patient-region pair.
-This dataset is used in examples and tests for \code{mr_tileplot()}.
+A fictional cancer-related dataset with multiple sampled regions per patient.
+Each row represents one tumor region from one patient. The dataset includes
+one discrete region-level variable, stored in \code{value}, and additional continuous
+region-level variable that can be used for sorting or alternative fill value.
 }
 \examples{
-data(example_regions)
 head(example_regions)
 }
 \keyword{datasets}
