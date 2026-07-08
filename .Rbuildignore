@@ -3,3 +3,4 @@
 ^.*\.Rproj$
 ^README\.Rmd$
 ^data-raw$
+^README_files$

@@ -178,10 +178,6 @@ mr_tileplot(region_data = example_regions,
             # for continuous region values you need to provide two colours for the gradient
             region_palette = c("#D95F02", "#7570B3"),
             annotation_palettes = annotation_palettes,
-            sort_by = c("Treatment_Response", "Stage"),
-            sort_levels = list(
-              Treatment_Response = c("Responder", "Stable", "Non_responder"),
-              Stage = c("I", "II", "III", "IV")),
             region_value = "tumor_cell_content",
             region_sort_by = "tumor_cell_content",
             region_sort_decreasing = TRUE,
