@@ -197,14 +197,20 @@ mr_tileplot <- function(region_data,
       width = 1, 
       height = 1
       )
-    
+  
+  region_legend_values <- get_legend_values(
+    data = region_plot,
+    palette = region_palette,
+    levels = region_sort_levels
+  )
+  
   p <- add_fill_scale(p,
                       data = region_plot,
                       scale_name = "Regions",
                       palette = region_palette,
                       na_colour = na_colour,
-                      legend_direction = "vertical",
-                      legend_ncol = 1
+                      legend_order = 1,
+                      legend_values = region_legend_values
                       )
     
   if (!is.null(annotation_plot)) {
@@ -230,13 +236,19 @@ mr_tileplot <- function(region_data,
           height = 1
           )
       
+      ann_legend_values <- get_legend_values(
+        data = ann_data,
+        palette = ann_palette,
+        levels = sort_levels[[ann]]
+      )
+      
       p <- add_fill_scale(p,
                           data = ann_data,
                           scale_name = ann,
                           palette = ann_palette,
                           na_colour = na_colour,
-                          legend_direction = "vertical",
-                          legend_ncol = 1
+                          legend_order = match(ann, annotation_order) + 1,
+                          legend_values = ann_legend_values
       )
     }
   }

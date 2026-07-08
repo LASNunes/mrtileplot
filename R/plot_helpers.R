@@ -3,8 +3,8 @@ add_fill_scale <- function(p,
                            scale_name,
                            palette = NULL,
                            na_colour = "grey90",
-                           legend_direction = "vertical",
-                           legend_ncol = 1) {
+                           legend_order = 1,
+                           legend_values = NULL) {
   is_continuous <- is.numeric(data$value)
   
   if (is_continuous) {
@@ -14,8 +14,9 @@ add_fill_scale <- function(p,
           name = scale_name,
           na.value = na_colour,
           guide = ggplot2:guide_colorbar(
-            direction = legend_direction,
-            title.position = "top"
+            direction = "vertical",
+            title.position = "top",
+            order = legend_order
           )
         )
       } else {
@@ -26,22 +27,35 @@ add_fill_scale <- function(p,
             high = palette[[length(palette)]],
             na.value = na_colour,
             guide = ggplot2::guide_colorbar(
-              direction = legend_direction,
-              title.position = "top"
+              direction = "vertical",
+              title.position = "top",
+              order = legend_order
             )
           )
         }
     } else {
+      if (!is.null(legend_values)) {
+        if (!is.null(palette) && !is.null(names(palette))) {
+          legend_values <- names(palette)
+        } else {
+          legend_values <- unique(as.character(data$value))
+        }
+      }
+      
       p <- p +
         ggplot2::scale_fill_manual(
           name = scale_name,
           values = palette,
+          limits = legend_values,
+          breaks = legend_values,
           na.value = na_colour,
+          drop = FALSE,
           guide = ggplot2::guide_legend(
-            direction = legend_direction,
-            ncol = legend_ncol,
+            direction = "vertical",
+            ncol = 1,
             byrow = TRUE,
-            title.position = "top"
+            title.position = "top",
+            order = legend_order
           )
         )
     }
@@ -57,4 +71,20 @@ get_annotation_palette <- function(annotation_name,
   }
   
   palette
+}
+
+get_legend_values <- function(data,
+                              palette = NULL,
+                              levels = NULL) {
+  data_values <- unique(as.character(data$value))
+  
+  if (!is.null(levels)) {
+    return(levels[levels %in% data_values])
+  }
+  
+  if (!is.null(palette) && !is.null(names(palette))) {
+    return(names(palette)[names(palette) %in% data_values])
+  }
+  
+  data_values
 }
