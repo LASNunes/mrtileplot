@@ -15,6 +15,8 @@ mr_tileplot(
   patient_order = NULL,
   region_order = NULL,
   annotation_order = NULL,
+  sort_by = NULL,
+  sort_levels = list(),
   palette = NULL,
   tile_colour = "black",
   na_colour = "grey90"
@@ -40,6 +42,12 @@ mr_tileplot(
 \item{region_order}{Optional character vector defining region order.}
 
 \item{annotation_order}{Optional character vector defining annotation row order.}
+
+\item{sort_by}{Optional character vector of annotation names used to sort patients.
+Only used when \code{annotation_data} is supplied and \code{patient_order} is \code{NULL}.}
+
+\item{sort_levels}{Optional named list giving the desired order of values for
+each variable in \code{sort_by}.}
 
 \item{palette}{Optional named vector of colors.}
 

@@ -15,6 +15,10 @@
 #' @param patient_order Optional character vector defining patient order.
 #' @param region_order Optional character vector defining region order.
 #' @param annotation_order Optional character vector defining annotation row order.
+#' @param sort_by Optional character vector of annotation names used to sort patients. 
+#' Only used when `annotation_data` is supplied and `patient_order` is `NULL`.
+#' @param sort_levels Optional named list giving the desired order of values for
+#' each variable in `sort_by`.
 #' @param palette Optional named vector of colors.
 #' @param tile_colour Border colour for tiles.
 #' @param na_colour Colour for missing values.
@@ -47,9 +51,17 @@ mr_tileplot <- function(region_data,
                         patient_order = NULL,
                         region_order = NULL,
                         annotation_order = NULL,
+                        sort_by = NULL,
+                        sort_levels = list(),
                         palette = NULL,
                         tile_colour = "black",
                         na_colour = "grey90") {
+  
+  check_columns(region_data, c(patient, region, value), "region_data")
+  
+  if (!is.null(annotation_data)) {
+    check_columns(annotation_data, c(patient, annotation, annotation_value), "annotation_data")
+  }
   
   region_long <- region_data |>
     dplyr::transmute(
@@ -74,6 +86,21 @@ mr_tileplot <- function(region_data,
     plot_data <- region_long
   }
   
+  if (is.null(patient_order) && !is.null(sort_by)) {
+    if (is.null(annotation_data)) {
+      stop("`annotation_data` must be supplied wjen using `sort_by`.", call. = FALSE)
+    }
+    
+    patient_order <- derive_patient_order(
+      annotation_data = annotation_data,
+      patient = patient, 
+      annotation = annotation,
+      annotation_value = annotation_value,
+      sort_by = sort_by,
+      sort_levels = sort_levels
+    )
+  }
+    
   if (is.null(patient_order)) {
     patient_order <- unique(plot_data$patient)
   }
@@ -110,9 +137,7 @@ mr_tileplot <- function(region_data,
   
   if (!is.null(palette)) {
     p <- p + 
-      ggplot2::scale_fill_manual(
-        values = palette, 
-        na.value = na_colour)
+      ggplot2::scale_fill_manual(values = palette, na.value = na_colour)
   }
   
   p

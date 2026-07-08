@@ -34,20 +34,25 @@ This is a basic example:
 
 ```{r example}
 library(mrtileplot)
-## basic example code
-region_data <- data.frame(
-  patient = rep(c("Patient1", "Patient2"), each = 3),
-  region = rep(c("Region1", "Region2", "Region3"), times = 2),
-  value = c("A", "A", "B", "B", "B", "C")
-)
+## example code
 
-annotation_data <- data.frame(
-  patient = rep(c("Patient1", "Patient2"), each = 2),
-  annotation = rep(c("Annotation1", "Annotation2"), times = 2),
-  annotation_value = c("X", "Y", "Y", "Z")
-)
+# Example region data
+head(example_regions)
 
-p <- mr_tileplot(region_data, annotation_data)
+# Example annotation data
+head(example_annotations)
+
+# Set colour palette
+example_pal <- c(
+  "Pos" = "forestgreen", "Neg" = "darkorange", 
+  "Female" = "grey20", "Male" = "white", 
+  "Stage I" = "grey20", "Stage II" = "grey", "Stage III" = "white", 
+  "Right colon" = "grey20", "Left colon" = "grey", "Rectum" = "white")
+
+# Create a tile plot
+p <- mr_tileplot(region_data = example_regions, 
+                 annotation_data = example_annotations, 
+                 palette = example_pal)
 
 plot(p)
 ```

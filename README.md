@@ -24,20 +24,39 @@ This is a basic example:
 
 ``` r
 library(mrtileplot)
-## basic example code
-region_data <- data.frame(
-  patient = rep(c("Patient1", "Patient2"), each = 3),
-  region = rep(c("Region1", "Region2", "Region3"), times = 2),
-  value = c("A", "A", "B", "B", "B", "C")
-)
+## example code
 
-annotation_data <- data.frame(
-  patient = rep(c("Patient1", "Patient2"), each = 2),
-  annotation = rep(c("Annotation1", "Annotation2"), times = 2),
-  annotation_value = c("X", "Y", "Y", "Z")
-)
+# Example region data
+head(example_regions)
+#>   patient region value
+#> 1      P1     T1   Pos
+#> 2      P1     T2   Neg
+#> 3      P1     T3   Neg
+#> 4      P2     T1   Pos
+#> 5      P2     T2   Neg
+#> 6      P3     T1   Neg
 
-p <- mr_tileplot(region_data, annotation_data)
+# Example annotation data
+head(example_annotations)
+#>   patient annotation annotation_value
+#> 1      P1     Gender           Female
+#> 2      P1      Stage         Stage II
+#> 3      P1   Location      Right colon
+#> 4      P2     Gender             Male
+#> 5      P2      Stage        Stage III
+#> 6      P2   Location       Left colon
+
+# Set colour palette
+example_pal <- c(
+  "Pos" = "forestgreen", "Neg" = "darkorange", 
+  "Female" = "grey20", "Male" = "white", 
+  "Stage I" = "grey20", "Stage II" = "grey", "Stage III" = "white", 
+  "Right colon" = "grey20", "Left colon" = "grey", "Rectum" = "white")
+
+# Create a tile plot
+p <- mr_tileplot(region_data = example_regions, 
+                 annotation_data = example_annotations, 
+                 palette = example_pal)
 
 plot(p)
 ```
