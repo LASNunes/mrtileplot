@@ -9,9 +9,9 @@ mr_tileplot(
   annotation_data = NULL,
   patient = "patient",
   region = "region",
-  value = "value",
+  region_value = "value",
   annotation = "annotation",
-  annotation_value = "annotation_value",
+  annotation_value = "value",
   patient_order = NULL,
   region_order = NULL,
   annotation_order = NULL,
@@ -19,6 +19,7 @@ mr_tileplot(
   region_sort_levels = NULL,
   region_sort_decreasing = FALSE,
   region_count_sort = c("last", "after_region", "none"),
+  sort_patients_by_regions = TRUE,
   region_prefix = "T",
   sort_by = NULL,
   sort_levels = list(),
@@ -39,7 +40,7 @@ mr_tileplot(
 
 \item{region}{Column name identifying the region or sample.}
 
-\item{value}{Column name containing the region value to plot.}
+\item{region_value}{Column name containing the region value to plot.}
 
 \item{annotation}{Column name identifying annotation tracks.}
 
@@ -61,7 +62,11 @@ categorical \code{region_sort_by} variable.}
 \item{region_sort_decreasing}{Logical indicating whether regions should be
 sorted in decreasing order.}
 
-\item{region_count_sort}{Character string indicating how to sort patients when
+\item{region_count_sort}{Character string indicating how to sort patients when}
+
+\item{sort_patients_by_regions}{Logical. If \code{TRUE}, region sorting also contributes
+to patient sorting. If \code{FALSE}, regions are sorted within each patient, but patient
+order is determined only by \code{patient_order}, annotation string, or the original data order.
 \code{region_sort_by} is supplied. \code{"last"} to sort by region count only after
 region and annotation sorting, or \code{"none"} to ignore region count.}
 

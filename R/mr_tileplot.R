@@ -9,7 +9,7 @@
 #' @param annotation_data Optional data frame with one row per patient-annotation pair.
 #' @param patient Column name identifying the patient or tumor.
 #' @param region Column name identifying the region or sample.
-#' @param value Column name containing the region value to plot.
+#' @param region_value Column name containing the region value to plot.
 #' @param annotation Column name identifying annotation tracks.
 #' @param annotation_value Column name containing the annotation values.
 #' @param patient_order Optional character vector defining patient order.
@@ -23,6 +23,9 @@
 #' @param region_sort_decreasing Logical indicating whether regions should be 
 #' sorted in decreasing order.
 #' @param region_count_sort Character string indicating how to sort patients when
+#' @param sort_patients_by_regions Logical. If `TRUE`, region sorting also contributes
+#' to patient sorting. If `FALSE`, regions are sorted within each patient, but patient
+#' order is determined only by `patient_order`, annotation string, or the original data order.
 #' `region_sort_by` is supplied. `"last"` to sort by region count only after 
 #' region and annotation sorting, or `"none"` to ignore region count. 
 #' @param region_prefix Prefix for region names when `region_sort_by` is supplied.
@@ -60,9 +63,9 @@ mr_tileplot <- function(region_data,
                         annotation_data = NULL,
                         patient = "patient",
                         region = "region",
-                        value = "value",
+                        region_value = "value",
                         annotation = "annotation",
-                        annotation_value = "annotation_value",
+                        annotation_value = "value",
                         patient_order = NULL,
                         region_order = NULL,
                         annotation_order = NULL,
@@ -70,6 +73,7 @@ mr_tileplot <- function(region_data,
                         region_sort_levels = NULL,
                         region_sort_decreasing = FALSE,
                         region_count_sort = c("last", "after_region", "none"),
+                        sort_patients_by_regions = TRUE,
                         region_prefix = "T",
                         sort_by = NULL,
                         sort_levels = list(),
@@ -80,7 +84,7 @@ mr_tileplot <- function(region_data,
                         tile_colour = "black",
                         na_colour = "grey90") {
   
-  check_columns(region_data, c(patient, region, value), "region_data")
+  check_columns(region_data, c(patient, region, region_value), "region_data")
   
   if (!is.null(annotation_data)) {
     check_columns(annotation_data, c(patient, annotation, annotation_value), "annotation_data")
@@ -92,7 +96,7 @@ mr_tileplot <- function(region_data,
     region_data = region_data,
     patient = patient,
     region = region,
-    value = value,
+    value = region_value,
     region_sort_by = region_sort_by,
     region_sort_levels = region_sort_levels,
     region_sort_decreasing = region_sort_decreasing,
@@ -111,7 +115,11 @@ mr_tileplot <- function(region_data,
     annotation_long <- NULL
   }
   
-  if (is.null(patient_order) && (!is.null(region_sort_by) || !is.null(sort_by))) {
+  use_region_patient_sort <- !is.null(region_sort_by) && isTRUE(sort_patients_by_regions)
+  
+  use_annotation_patient_sort <- !is.null(sort_by) && length(sort_by) > 0
+  
+  if (is.null(patient_order) && (use_region_patient_sort || use_annotation_patient_sort)) {
     patient_order <- derive_patient_order(
       annotation_data = annotation_data,
       patient = patient, 
@@ -119,16 +127,16 @@ mr_tileplot <- function(region_data,
       annotation_value = annotation_value,
       sort_by = sort_by,
       sort_levels = sort_levels,
-      region_long = if (!is.null(region_sort_by)) region_long else NULL,
+      region_long = if (use_region_patient_sort) region_long else NULL,
       region_count_sort = region_count_sort
     )
   }
     
   if (is.null(patient_order)) {
-    patient_order <- unique(region_long$patient)
+    patient_order <- unique(region_data[[patient]])
     
-    if (!is.null(annotation_long)) {
-      patient_order <- unique(c(patient_order, annotation_long$patient))
+    if (!is.null(annotation_data)) {
+      patient_order <- unique(c(patient_order, annotation_data[[patient]]))
     }
   }
   
@@ -206,7 +214,7 @@ mr_tileplot <- function(region_data,
   
   p <- add_fill_scale(p,
                       data = region_plot,
-                      scale_name = "Regions",
+                      scale_name = region_value,
                       palette = region_palette,
                       na_colour = na_colour,
                       legend_order = 1,
@@ -275,8 +283,8 @@ mr_tileplot <- function(region_data,
       legend.box = "horizontal",
       legend.direction = "vertical",
       legend.box.just = "left",
-      legend.title = ggplot2::element_text(size = 8, face = "bold"),
-      legend.text = ggplot2::element_text(size = 8),
+      legend.title = ggplot2::element_text(size = 10, face = "bold"),
+      legend.text = ggplot2::element_text(size = 10),
       legend.spacing.x = ggplot2::unit(0.4, "cm"),
       legend.key.size = ggplot2::unit(0.35, "cm")
     )

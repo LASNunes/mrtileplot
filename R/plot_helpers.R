@@ -9,43 +9,50 @@ add_fill_scale <- function(p,
   
   if (is_continuous) {
     if (is.null(palette)) {
-      p <- p +
+      return(
+        p +
+          ggplot2::scale_fill_gradient(
+            name = scale_name,
+            na.value = na_colour,
+            guide = ggplot2::guide_colourbar(
+              direction = "vertical",
+              title.position = "top",
+              order = legend_order
+              )
+            )
+        )
+      
+    } 
+    
+    return(
+      p +
         ggplot2::scale_fill_gradient(
           name = scale_name,
+          low = palette[[1]],
+          high = palette[[length(palette)]],
           na.value = na_colour,
-          guide = ggplot2:guide_colorbar(
+          guide = ggplot2::guide_colourbar(
             direction = "vertical",
             title.position = "top",
             order = legend_order
           )
         )
-      } else {
-        p <- p +
-          ggplot2::scale_fill_gradient(
-            name = scale_name,
-            low = palette[[1]],
-            high = palette[[length(palette)]],
-            na.value = na_colour,
-            guide = ggplot2::guide_colorbar(
-              direction = "vertical",
-              title.position = "top",
-              order = legend_order
-            )
-          )
-        }
+    )
+  }
+  
+  if (is.null(legend_values)) {
+    if (!is.null(palette) && !is.null(names(palette))) {
+      legend_values <- names(palette)
     } else {
-      if (!is.null(legend_values)) {
-        if (!is.null(palette) && !is.null(names(palette))) {
-          legend_values <- names(palette)
-        } else {
-          legend_values <- unique(as.character(data$value))
-        }
-      }
-      
-      p <- p +
-        ggplot2::scale_fill_manual(
+      legend_values <- unique(as.character(data$value))
+    }
+  }
+  
+  if (is.null(palette)) {
+    return(
+      p +
+        ggplot2::scale_fill_discrete(
           name = scale_name,
-          values = palette,
           limits = legend_values,
           breaks = legend_values,
           na.value = na_colour,
@@ -58,9 +65,25 @@ add_fill_scale <- function(p,
             order = legend_order
           )
         )
-    }
+    )
+  }
   
-  p
+  p +
+    ggplot2::scale_fill_manual(
+      name = scale_name,
+      values = palette,
+      limits = legend_values,
+      breaks = legend_values,
+      na.value = na_colour,
+      drop = FALSE,
+      guide = ggplot2::guide_legend(
+        direction = "vertical",
+        ncol = 1,
+        byrow = TRUE,
+        title.position = "top",
+        order = legend_order
+      )
+    )
 }
 
 get_annotation_palette <- function(annotation_name,

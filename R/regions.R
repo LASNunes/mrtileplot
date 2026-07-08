@@ -49,7 +49,7 @@ prepare_region_tiles <- function(region_data,
       dplyr::mutate(
         .region_sort_raw = .data[[region_sort_by]],
         .region_sort_value = make_sort_value(
-          .region_sort_raw,
+          .data$.region_sort_raw,
           levels = region_sort_levels,
           decreasing = region_sort_decreasing
         )
@@ -61,7 +61,7 @@ prepare_region_tiles <- function(region_data,
       dplyr::group_by(.data$.patient) |>
       dplyr::mutate(
         .region_index = dplyr::row_number(),
-        .row = paste0(region_prefix, .region_index)
+        .row = paste0(region_prefix, .data$.region_index)
       ) |>
       dplyr::ungroup()
   } else {
