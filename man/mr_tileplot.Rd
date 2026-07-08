@@ -15,8 +15,17 @@ mr_tileplot(
   patient_order = NULL,
   region_order = NULL,
   annotation_order = NULL,
+  region_sort_by = NULL,
+  region_sort_levels = NULL,
+  region_sort_decreasing = FALSE,
+  region_count_sort = c("last", "after_region", "none"),
+  region_prefix = "T",
   sort_by = NULL,
   sort_levels = list(),
+  gap = 0.35,
+  split_legends = TRUE,
+  region_palette = NULL,
+  annotation_palettes = NULL,
   palette = NULL,
   tile_colour = "black",
   na_colour = "grey90"
@@ -43,11 +52,37 @@ mr_tileplot(
 
 \item{annotation_order}{Optional character vector defining annotation row order.}
 
-\item{sort_by}{Optional character vector of annotation names used to sort patients.
-Only used when \code{annotation_data} is supplied and \code{patient_order} is \code{NULL}.}
+\item{region_sort_by}{Optional column name in \code{region_data} used to sort regions
+within each patient. When supplied, plotted region names are rewritten as
+consecutive names such as \code{"T1"}, \code{"T2"}, etc.}
+
+\item{region_sort_levels}{Optional character vector defining the order of a
+categorical \code{region_sort_by} variable.}
+
+\item{region_sort_decreasing}{Logical indicating whether regions should be
+sorted in decreasing order.}
+
+\item{region_count_sort}{Character string indicating how to sort patients when
+\code{region_sort_by} is supplied. \code{"last"} to sort by region count only after
+region and annotation sorting, or \code{"none"} to ignore region count.}
+
+\item{region_prefix}{Prefix for region names when \code{region_sort_by} is supplied.}
+
+\item{sort_by}{Optional character vector of annotation names used to sort
+patients after region sorting.}
 
 \item{sort_levels}{Optional named list giving the desired order of values for
 each variable in \code{sort_by}.}
+
+\item{gap}{Numeric size of the visual gap between region rows and annotation rows.}
+
+\item{split_legends}{Logical. If \code{TRUE}, draw separate legends for regions and
+each annotation track.}
+
+\item{region_palette}{Optional named vector for region values, or two colours
+for a continuous region scale.}
+
+\item{annotation_palettes}{Optional named list of palettes, one per annotation.}
 
 \item{palette}{Optional named vector of colors.}
 

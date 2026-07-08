@@ -15,10 +15,27 @@
 #' @param patient_order Optional character vector defining patient order.
 #' @param region_order Optional character vector defining region order.
 #' @param annotation_order Optional character vector defining annotation row order.
-#' @param sort_by Optional character vector of annotation names used to sort patients. 
-#' Only used when `annotation_data` is supplied and `patient_order` is `NULL`.
+#' @param region_sort_by Optional column name in `region_data` used to sort regions 
+#' within each patient. When supplied, plotted region names are rewritten as 
+#' consecutive names such as `"T1"`, `"T2"`, etc.
+#' @param region_sort_levels Optional character vector defining the order of a
+#' categorical `region_sort_by` variable.
+#' @param region_sort_decreasing Logical indicating whether regions should be 
+#' sorted in decreasing order.
+#' @param region_count_sort Character string indicating how to sort patients when
+#' `region_sort_by` is supplied. `"last"` to sort by region count only after 
+#' region and annotation sorting, or `"none"` to ignore region count. 
+#' @param region_prefix Prefix for region names when `region_sort_by` is supplied.
+#' @param sort_by Optional character vector of annotation names used to sort 
+#' patients after region sorting. 
 #' @param sort_levels Optional named list giving the desired order of values for
 #' each variable in `sort_by`.
+#' @param gap Numeric size of the visual gap between region rows and annotation rows.
+#' @param split_legends Logical. If `TRUE`, draw separate legends for regions and
+#' each annotation track.
+#' @param region_palette Optional named vector for region values, or two colours
+#' for a continuous region scale.
+#' @param annotation_palettes Optional named list of palettes, one per annotation.
 #' @param palette Optional named vector of colors.
 #' @param tile_colour Border colour for tiles.
 #' @param na_colour Colour for missing values.
@@ -51,8 +68,17 @@ mr_tileplot <- function(region_data,
                         patient_order = NULL,
                         region_order = NULL,
                         annotation_order = NULL,
+                        region_sort_by = NULL,
+                        region_sort_levels = NULL,
+                        region_sort_decreasing = FALSE,
+                        region_count_sort = c("last", "after_region", "none"),
+                        region_prefix = "T",
                         sort_by = NULL,
                         sort_levels = list(),
+                        gap = 0.35,
+                        split_legends = TRUE,
+                        region_palette = NULL,
+                        annotation_palettes = NULL,
                         palette = NULL,
                         tile_colour = "black",
                         na_colour = "grey90") {
@@ -63,13 +89,18 @@ mr_tileplot <- function(region_data,
     check_columns(annotation_data, c(patient, annotation, annotation_value), "annotation_data")
   }
   
-  region_long <- region_data |>
-    dplyr::transmute(
-      patient = .data[[patient]],
-      row = .data[[region]],
-      value = .data[[value]],
-      row_type = "region"
-    )
+  region_count_sort <- match.arg(region_count_sort)
+  
+  region_long <- prepare_region_tiles(
+    region_data = region_data,
+    patient = patient,
+    region = region,
+    value = value,
+    region_sort_by = region_sort_by,
+    region_sort_levels = region_sort_levels,
+    region_sort_decreasing = region_sort_decreasing,
+    region_prefix = region_prefix
+  )
   
   if (!is.null(annotation_data)) {
     annotation_long <- annotation_data |>
@@ -79,66 +110,179 @@ mr_tileplot <- function(region_data,
         value = .data[[annotation_value]],
         row_type = "annotation"
       )
-    
-    plot_data <- dplyr::bind_rows(annotation_long, region_long)
   } else {
     annotation_long <- NULL
-    plot_data <- region_long
   }
   
-  if (is.null(patient_order) && !is.null(sort_by)) {
-    if (is.null(annotation_data)) {
-      stop("`annotation_data` must be supplied wjen using `sort_by`.", call. = FALSE)
-    }
-    
+  if (is.null(patient_order) && (!is.null(region_sort_by) || !is.null(sort_by))) {
     patient_order <- derive_patient_order(
       annotation_data = annotation_data,
       patient = patient, 
       annotation = annotation,
       annotation_value = annotation_value,
       sort_by = sort_by,
-      sort_levels = sort_levels
+      sort_levels = sort_levels,
+      region_long = if (!is.null(region_sort_by)) region_long else NULL,
+      region_count_sort = region_count_sort
     )
   }
     
   if (is.null(patient_order)) {
-    patient_order <- unique(plot_data$patient)
+    patient_order <- unique(region_long$patient)
+    
+    if (!is.null(annotation_long)) {
+      patient_order <- unique(c(patient_order, annotation_long$patient))
+    }
   }
   
   if (is.null(region_order)) {
-    region_order <- unique(region_long$row)
+    if (!is.null(region_sort_by)) {
+      max_region <- max(region_long$region_index, na.rm = TRUE)
+      region_order <- paste0(region_prefix, seq_len(max_region))
+    } else {
+      region_order <- unique(region_long$row)
+    }
   }
   
   if (is.null(annotation_order) && !is.null(annotation_long)) {
     annotation_order <- unique(annotation_long$row)
   }
   
-  row_order <- c(annotation_order, region_order)
+  if (is.null(annotation_order)) {
+    annotation_order <- character()
+  }
   
-  plot_data$patient <- factor(plot_data$patient, levels = patient_order)
-  plot_data$row <- factor(plot_data$row, levels = row_order)
+  n_annotations <- length(annotation_order)
   
-  p <- ggplot2::ggplot(
-    plot_data,
-    ggplot2::aes(x = patient, y = row, fill = value)
-  ) +
-    ggplot2::geom_tile(colour = tile_colour) +
+  region_positions <- data.frame(
+    row = region_order,
+    y = seq_along(region_order) + n_annotations + gap
+  )
+  
+  annotation_positions <- data.frame(
+    row = annotation_order,
+    y = n_annotations - seq_along(annotation_order) + 1
+  )
+  
+  patient_positions <- data.frame(
+    patient = patient_order,
+    x = seq_along(patient_order)
+  )
+  
+  region_plot <- region_long |>
+    dplyr::left_join(patient_positions, by = "patient") |>
+    dplyr::left_join(region_positions, by = "row")
+  
+  if (!is.null(annotation_long)) {
+    annotation_plot <- annotation_long |>
+      dplyr::left_join(patient_positions, by = "patient") |>
+      dplyr::left_join(annotation_positions, by = "row")
+  } else {
+    annotation_plot <- NULL
+  }
+  
+  y_breaks <- dplyr::bind_rows(region_positions, annotation_positions) |>
+    dplyr::arrange(.data$y)
+  
+  if (is.null(region_palette)){
+    region_palette <- palette
+  }
+  
+  p <- ggplot2::ggplot()
+  
+  if (split_legends) {
+    p <- p +
+      ggplot2::geom_tile(
+        data = region_plot,
+        ggplot2::aes(x = .data$x, 
+                     y = .data$y, 
+                     fill = .data$value),
+        colour = tile_colour, 
+        width = 0.9, 
+        height = 0.9
+      )
+    
+    p <- add_fill_scale(p,
+                        data = region_plot,
+                        scale_name = "Regions",
+                        palette = region_palette,
+                        na_colour = na_colour
+                        )
+    
+    if (!is.null(annotation_plot)) {
+      for (ann in annotation_order) {
+        ann_data <- annotation_plot |>
+          dplyr::filter(.data$row == ann)
+        
+        ann_palette <- get_annotation_palette(
+          annotation_name = ann,
+          annotation_palettes = annotation_palettes,
+          palette = palette
+        )
+        
+        p <- p +
+          ggnewscale::new_scale_fill() +
+          ggplot2::geom_tile(
+            data = ann_data,
+            ggplot2::aes(x = .data$x, 
+                         y = .data$y, 
+                         fill = .data$value),
+            colour = tile_colour, 
+            width = 0.9, 
+            height = 0.9
+          )
+        
+        p <- add_fill_scale(p,
+                            data = ann_data,
+                            scale_name = ann,
+                            palette = ann_palette,
+                            na_colour = na_colour
+                            )
+      }
+    }
+  } else {
+    plot_data <- dplyr::bind_rows(region_plot, annotation_plot)
+    
+    p <- p +
+      ggplot2::geom_tile(
+        data = plot_data,
+        ggplot2::aes(x = .data$x, 
+                     y = .data$y, 
+                     fill = .data$value),
+        colour = tile_colour, 
+        width = 0.9, 
+        height = 0.9
+      )
+    
+    p <- add_fill_scale(p,
+                        data = plot_data,
+                        scale_name = NULL,
+                        palette = palette,
+                        na_colour = na_colour
+    )
+  }
+  
+  p +
+    ggplot2::scale_x_continuous(
+      breaks = patient_positions$x,
+      labels = patient_positions$patient,
+      expand = ggplot2::expansion(add = 0.6)
+    ) +
+    ggplot2::scale_y_continuous(
+      breaks = y_breaks$y,
+      labels = y_breaks$row,
+      expand = ggplot2::expansion(add = 0.6)
+    ) +
     ggplot2::coord_fixed() +
     ggplot2::theme_minimal() +
     ggplot2::theme(
       panel.grid = ggplot2::element_blank(),
-      axis.text.x = ggplot2::element_text(
-        angle = 90,
-        hjust = 1,
-        vjust = 0.5
-      )
-    ) +
-    ggplot2::labs(x = NULL, y = NULL, fill = NULL)
-  
-  if (!is.null(palette)) {
-    p <- p + 
-      ggplot2::scale_fill_manual(values = palette, na.value = na_colour)
-  }
-  
-  p
+      axis.title = ggplot2::element_blank(),
+      axis.title.x = ggplot2::element_blank(),
+      legend.position = "right",
+      legend.title = ggplot2::element_text(size = 10),
+      legend.text = ggplot2::element_text(size = 8),
+      legend.spacing.y = ggplot2::unit(0.1, "cm"),
+      legend.key.size = ggplot2::unit(0.4, "cm")
+    )
 }
