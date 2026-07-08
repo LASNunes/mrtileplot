@@ -178,7 +178,7 @@ The annotation dataset should contain one row per patient-annotation pair in the
 
 Column names can be changed using the function arguments:
 
-```{r}
+```{r, fig.keep='none'}
 mr_tileplot(region_data = example_regions, 
             annotation_data = example_annotations,
             patient = "patient",

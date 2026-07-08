@@ -228,8 +228,6 @@ mr_tileplot(region_data = example_regions,
             )
 ```
 
-![](README_files/figure-gfm/unnamed-chunk-1-1.png)<!-- -->
-
 ## Citation
 
 If you use `mrtileplot` in your research, please cite it with:
