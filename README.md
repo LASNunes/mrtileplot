@@ -62,3 +62,24 @@ plot(p)
 ```
 
 <img src="man/figures/README-example-1.png" alt="" width="100%" />
+
+### Sorting by annotations example
+
+``` r
+
+# Create a tile plot sorted by annotations
+p_sorted <- mr_tileplot(region_data = example_regions, 
+                        annotation_data = example_annotations, 
+                        palette = example_pal,
+                        annotation_order = c("Location", "Stage", "Gender"),
+                        sort_by = c("Gender", "Stage", "Location"),
+                        sort_levels = list(
+                          Gender = c("Female", "Male"),
+                          Stage = c("Stage I", "Stage II", "Stage III"),
+                          Location = c("Right colon", "Left colon", "Rectum"))
+                 )
+
+plot(p_sorted)
+```
+
+<img src="man/figures/README-sort-example-1.png" alt="" width="100%" />
