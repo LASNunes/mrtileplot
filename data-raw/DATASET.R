@@ -31,6 +31,10 @@ example_regions$tumor_cell_content <- round(
   digits = 2
 )
 
+example_regions$high_TCC <- ifelse(
+  example_regions$tumor_cell_content > 0.6, TRUE, FALSE
+)
+
 # Patient-level annotations in wide-format
 patient_annotations_wide <- data.frame(
   patient = patients,

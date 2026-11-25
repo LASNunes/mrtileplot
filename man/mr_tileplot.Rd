@@ -21,6 +21,9 @@ mr_tileplot(
   region_count_sort = c("last", "after_region", "none"),
   sort_patients_by_regions = TRUE,
   region_prefix = "T",
+  region_diagonal = NULL,
+  region_diagonal_label = "High expression",
+  region_diagonal_colour = "black",
   sort_by = NULL,
   sort_levels = list(),
   gap = 0.35,
@@ -71,6 +74,13 @@ order is determined only by \code{patient_order}, annotation string, or the orig
 region and annotation sorting, or \code{"none"} to ignore region count.}
 
 \item{region_prefix}{Prefix for region names when \code{region_sort_by} is supplied.}
+
+\item{region_diagonal}{Optional column containing TRUE/FALSE values indicating which
+regional should receive a diagonal.}
+
+\item{region_diagonal_label}{Label for the diagonal legend.}
+
+\item{region_diagonal_colour}{Colour for the diagonal legend.}
 
 \item{sort_by}{Optional character vector of annotation names used to sort
 patients after region sorting.}

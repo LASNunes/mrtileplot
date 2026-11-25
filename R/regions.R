@@ -32,7 +32,12 @@ prepare_region_tiles <- function(region_data,
                                  region_sort_by = NULL,
                                  region_sort_levels = NULL,
                                  region_sort_decreasing = FALSE,
-                                 region_prefix = "T") {
+                                 region_prefix = "T",
+                                 region_diagonal = NULL) {
+  if (!is.null(region_diagonal)) {
+    check_columns(region_data, region_diagonal, "region_data")
+  }
+  
   if (!is.null(region_sort_by)) {
     check_columns(region_data, region_sort_by, "region_data")
   }
@@ -41,7 +46,12 @@ prepare_region_tiles <- function(region_data,
     dplyr::mutate(
       .patient = .data[[patient]],
       .original_region = .data[[region]],
-      .value = .data[[value]]
+      .value = .data[[value]],
+      .diagonal = if (is.null(region_diagonal)) {
+        FALSE
+      } else {
+        .data[[region_diagonal]]
+      }
     )
   
   if (!is.null(region_sort_by)) {
@@ -88,6 +98,7 @@ prepare_region_tiles <- function(region_data,
       original_region = .data$.original_region,
       region_sort_raw = .data$.region_sort_raw,
       region_sort_value = .data$.region_sort_value,
-      region_index = .data$.region_index
+      region_index = .data$.region_index,
+      diagonal = .data$.diagonal
     )
 }

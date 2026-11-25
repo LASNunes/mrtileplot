@@ -11,5 +11,10 @@ Create tile plots for multiregional tumor, patient, and sample-level data with o
 \author{
 \strong{Maintainer}: Luís Nunes \email{luis.nunes@ous-research.no}
 
+Authors:
+\itemize{
+  \item Luís Nunes \email{luis.nunes@ous-research.no}
+}
+
 }
 \keyword{internal}

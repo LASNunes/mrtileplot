@@ -111,3 +111,25 @@ get_legend_values <- function(data,
   
   data_values
 }
+
+draw_key_diagonal <- function(data, params, size) {
+  grid::grobTree(
+    grid::rectGrob(
+      gp = grid::gpar(
+        fill = NA,
+        col = data$colour,
+        lwd = 0.5
+      )
+    ),
+    grid::segmentsGrob(
+      x0 = 0,
+      y0 = 0,
+      x1 = 1,
+      y1 = 1,
+      gp = grid::gpar(
+        col = data$colour,
+        lwd = 1.5
+      )
+    )
+  )
+}

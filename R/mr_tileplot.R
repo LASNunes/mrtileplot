@@ -31,6 +31,10 @@
 #' `region_sort_by` is supplied. `"last"` to sort by region count only after 
 #' region and annotation sorting, or `"none"` to ignore region count. 
 #' @param region_prefix Prefix for region names when `region_sort_by` is supplied.
+#' @param region_diagonal Optional column containing TRUE/FALSE values indicating which
+#' regional should receive a diagonal.
+#' @param region_diagonal_label Label for the diagonal legend.
+#' @param region_diagonal_colour Colour for the diagonal legend.
 #' @param sort_by Optional character vector of annotation names used to sort 
 #' patients after region sorting. 
 #' @param sort_levels Optional named list giving the desired order of values for
@@ -65,6 +69,9 @@ mr_tileplot <- function(region_data,
                         region_count_sort = c("last", "after_region", "none"),
                         sort_patients_by_regions = TRUE,
                         region_prefix = "T",
+                        region_diagonal = NULL,
+                        region_diagonal_label = "High expression",
+                        region_diagonal_colour = "black",
                         sort_by = NULL,
                         sort_levels = list(),
                         gap = 0.35,
@@ -90,7 +97,8 @@ mr_tileplot <- function(region_data,
     region_sort_by = region_sort_by,
     region_sort_levels = region_sort_levels,
     region_sort_decreasing = region_sort_decreasing,
-    region_prefix = region_prefix
+    region_prefix = region_prefix,
+    region_diagonal = region_diagonal
   )
   
   if (!is.null(annotation_data)) {
@@ -210,6 +218,32 @@ mr_tileplot <- function(region_data,
                       legend_order = 1,
                       legend_values = region_legend_values
                       )
+  
+  if (!is.null(region_diagonal)) {
+    diagonal_data <- region_plot |>
+      dplyr::filter(.data$diagonal == TRUE)
+    
+    p <- p +
+      ggplot2::geom_segment(
+        data = diagonal_data,
+        ggplot2::aes(
+          x = .data$x -0.5,
+          xend = .data$x + 0.5,
+          y = .data$y - 0.5,
+          yend = .data$y + 0.5,
+          linetype = region_diagonal_label
+        ),
+        colour = region_diagonal_colour,
+        linewidth = 1,
+        key_glyph = draw_key_diagonal,
+        show.legend = TRUE
+      ) +
+      ggplot2::scale_linetype_manual(
+        name = NULL,
+        values = stats::setNames("solid", region_diagonal_label),
+        guide = ggplot2::guide_legend(order = 99)
+      )
+  }
     
   if (!is.null(annotation_plot)) {
     for (ann in annotation_order) {
