@@ -187,6 +187,32 @@ mr_tileplot(region_data = example_regions,
 
 ![](README_files/figure-gfm/region-sort-plot2-1.png)<!-- -->
 
+### Highlighting regions with diagonal lines
+
+``` r
+# An additional binary region-level variable can be displayed using diagonal lines over the region tiles. This allows users to highlight specific regional characteristics independently of the tile fill colour.
+example_regions <- example_regions |>
+  dplyr::mutate(
+    high_TCC = tumor_cell_content > median(tumor_cell_content, na.rm = TRUE)
+  )
+
+mr_tileplot(region_data = example_regions, 
+            annotation_data = example_annotations,
+            # for continuous region values you need to provide two colours for the gradient
+            region_palette = c("#D95F02", "#7570B3"),
+            annotation_palettes = annotation_palettes,
+            region_value = "tumor_cell_content",
+            region_sort_by = "tumor_cell_content",
+            region_sort_decreasing = TRUE,
+            sort_patients_by_regions = FALSE,
+            region_diagonal = "high_TCC",
+            region_diagonal_label = "High tumor cell content",
+            region_diagonal_colour = "black"
+            )
+```
+
+![](README_files/figure-gfm/region-diagonal-plot-1.png)<!-- -->
+
 ### Controlling region-count sorting
 
 When patients have different numbers of samples regions, you can decide
