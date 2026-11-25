@@ -11,6 +11,7 @@ A data frame with 45 rows and 4 columns:
 \item{region}{Original region or sample identifier.}
 \item{value}{Discrete region-level immune phenotype.}
 \item{tumor_cell_content}{Continuous tumor cell content between 0 and 1.}
+\item{high_TCC}{Logical variable indicating whether tumor cell content is above 0.6.}
 }
 }
 \source{
